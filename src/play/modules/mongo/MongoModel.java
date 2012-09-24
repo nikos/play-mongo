@@ -1,6 +1,9 @@
 package play.modules.mongo;
 
 import org.bson.types.ObjectId;
+import play.db.Model;
+
+import java.io.Serializable;
 
 /**
  * This class provides the abstract declarations for all MongoModels.
@@ -8,7 +11,7 @@ import org.bson.types.ObjectId;
  * 
  * @author Andrew Louth
  */
-public class MongoModel {
+public class MongoModel implements Model, Serializable {
 	
     public ObjectId get_id() {
         throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
@@ -69,5 +72,19 @@ public class MongoModel {
     public static String[] getIndexes(){
     	throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
     }
-    
+
+    @Override
+    public void _save() {
+        save();
+    }
+
+    @Override
+    public void _delete() {
+        delete();
+    }
+
+    @Override
+    public Object _key() {
+        return get_id().toString();
+    }
 }

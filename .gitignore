@@ -1,5 +1,8 @@
 .classpath
 .project
+*.pyc
+/precompiled
+/logs
 /bin
 /dist
 jardesc.jardesc

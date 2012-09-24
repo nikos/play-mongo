@@ -20,6 +20,4 @@ public class MongoMapper {
 		return mapper;
 	}
 	
-	
-	
 }
