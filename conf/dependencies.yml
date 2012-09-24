@@ -1,0 +1,4 @@
+self: play -> mongo 1.4
+
+require:
+    - play

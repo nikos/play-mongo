@@ -85,6 +85,6 @@ public class MongoModel implements Model, Serializable {
 
     @Override
     public Object _key() {
-        return get_id().toString();
+        return get_id();
     }
 }

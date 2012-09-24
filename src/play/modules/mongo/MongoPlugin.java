@@ -122,7 +122,7 @@ public class MongoPlugin extends PlayPlugin {
 
         @Override
         public Object keyValue(Model m) {
-            throw new UnsupportedOperationException("keyValue not yet suppored");
+            return m._key();
         }
 
         @Override
