@@ -2,8 +2,10 @@
 
 <project name="mongo" default="build" basedir=".">
 
+	<property file="build.properties"/>
+
     <target name="check" unless="play.path">
-        <fail message="Please specify Play framework path using -Dplay.path=/path/to/framework/home" />
+        <fail message="Please specify Play framework path using -Dplay.path=/path/to/framework/home or fill build.properties file"/>
     </target>
 
     <path id="project.classpath">
