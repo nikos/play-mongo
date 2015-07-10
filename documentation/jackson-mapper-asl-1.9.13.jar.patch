@@ -1,0 +1,100 @@
+diff --git a/src/org/codehaus/jackson/map/SerializationConfig.java b/src/org/codehaus/jackson/map/SerializationConfig.java
+index 2cfac31..4354c97 100644
+--- a/src/org/codehaus/jackson/map/SerializationConfig.java
++++ b/src/org/codehaus/jackson/map/SerializationConfig.java
+@@ -333,6 +333,15 @@
+         /**
+          * Feature that determines whether {@link java.util.Date} values
+          * (and Date-based things like {@link java.util.Calendar}s) are to be
++         * serialized as object prefixed with $date as if they wer inserted bya MongoDB Java driver,
++         * value of $date field is either Number or String regarding 
++         * ${@link #WRITE_DATES_AS_TIMESTAMPS} feature 
++         */
++        WRITE_DATES_AS_OBJECTS(false),
++
++        /**
++         * Feature that determines whether {@link java.util.Date} values
++         * (and Date-based things like {@link java.util.Calendar}s) are to be
+          * serialized as numeric timestamps (true; the default),
+          * or as something else (usually textual representation).
+          * If textual representation is used, the actual format is
+diff --git a/src/org/codehaus/jackson/map/deser/std/StdDeserializer.java b/src/org/codehaus/jackson/map/deser/std/StdDeserializer.java
+index fa0aacf..a5e8d1d 100644
+--- a/src/org/codehaus/jackson/map/deser/std/StdDeserializer.java
++++ b/src/org/codehaus/jackson/map/deser/std/StdDeserializer.java
+@@ -557,6 +557,9 @@
+         throws IOException, JsonProcessingException
+     {
+         JsonToken t = jp.getCurrentToken();
++        if (t == JsonToken.VALUE_EMBEDDED_OBJECT) {
++            return (java.util.Date)jp.getEmbeddedObject();
++        }
+         if (t == JsonToken.VALUE_NUMBER_INT) {
+             return new java.util.Date(jp.getLongValue());
+         }
+diff --git a/src/org/codehaus/jackson/map/ser/StdSerializerProvider.java b/src/org/codehaus/jackson/map/ser/StdSerializerProvider.java
+index df67f13..09581b6 100644
+--- a/src/org/codehaus/jackson/map/ser/StdSerializerProvider.java
++++ b/src/org/codehaus/jackson/map/ser/StdSerializerProvider.java
+@@ -515,15 +515,20 @@
+     public final void defaultSerializeDateValue(long timestamp, JsonGenerator jgen)
+         throws IOException, JsonProcessingException
+     {
+-        // [JACKSON-87]: Support both numeric timestamps and textual
+-        if (isEnabled(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS)) {
+-            jgen.writeNumber(timestamp);
+-        } else {
+-            if (_dateFormat == null) {
+-                // must create a clone since Formats are not thread-safe:
+-                _dateFormat = (DateFormat)_config.getDateFormat().clone();
+-            }
+-            jgen.writeString(_dateFormat.format(new Date(timestamp)));
++        if (isEnabled(SerializationConfig.Feature.WRITE_DATES_AS_OBJECTS)) {
++            jgen.writeObject(new Date(timestamp));
++        }
++        else {
++	    	// [JACKSON-87]: Support both numeric timestamps and textual
++	        if (isEnabled(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS)) {
++	            jgen.writeNumber(timestamp);
++	        } else {
++	            if (_dateFormat == null) {
++	                // must create a clone since Formats are not thread-safe:
++	                _dateFormat = (DateFormat)_config.getDateFormat().clone();
++	            }
++	            jgen.writeString(_dateFormat.format(new Date(timestamp)));
++	        }
+         }
+     }
+ 
+@@ -531,16 +536,21 @@
+     public final void defaultSerializeDateValue(Date date, JsonGenerator jgen)
+         throws IOException, JsonProcessingException
+     {
+-        // [JACKSON-87]: Support both numeric timestamps and textual
+-        if (isEnabled(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS)) {
+-            jgen.writeNumber(date.getTime());
+-        } else {
+-            if (_dateFormat == null) {
+-                DateFormat blueprint = _config.getDateFormat();
+-                // must create a clone since Formats are not thread-safe:
+-                _dateFormat = (DateFormat)blueprint.clone();
+-            }
+-            jgen.writeString(_dateFormat.format(date));
++        if (isEnabled(SerializationConfig.Feature.WRITE_DATES_AS_OBJECTS)) {
++            jgen.writeObject(date);
++        }
++        else {
++	        // [JACKSON-87]: Support both numeric timestamps and textual
++	        if (isEnabled(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS)) {
++	            jgen.writeNumber(date.getTime());
++	        } else {
++	            if (_dateFormat == null) {
++	                DateFormat blueprint = _config.getDateFormat();
++	                // must create a clone since Formats are not thread-safe:
++	                _dateFormat = (DateFormat)blueprint.clone();
++	            }
++	            jgen.writeString(_dateFormat.format(date));
++	        }
+         }
+     }
+ 
