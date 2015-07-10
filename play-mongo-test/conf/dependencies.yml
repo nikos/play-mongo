@@ -1,0 +1,13 @@
+# Application dependencies
+
+require:
+    - play
+    - localModuleRev -> mongo 1.4
+
+repositories:
+    - localModuleRev:
+        type:       local
+        artifact:   "${application.path}/../../[module]-[revision]"
+        contains:
+            - localModuleRev -> *
+

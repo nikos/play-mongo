@@ -13,14 +13,12 @@ import java.util.List;
 public class MongoFixtures extends Fixtures {
     
     public static void deleteDatabase() {
-    	idCache.clear();
         for (Class clz: Play.classloader.getAssignableClasses(MongoModel.class)) {
             dropCollection(clz);
         }
     }
     
     public static void delete(Class<? extends MongoModel> ... types) {
-    	idCache.clear();
         for (Class<? extends MongoModel> type: types) {
             dropCollection(type);
         }
@@ -36,7 +34,6 @@ public class MongoFixtures extends Fixtures {
     }
     
     public static void delete(List<Class<? extends Model>> classes) {
-    	idCache.clear();
         for (Class<? extends Model> type : classes) {
             dropCollection(type);
         }

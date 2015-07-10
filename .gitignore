@@ -11,3 +11,6 @@ jardesc.jardesc
 /play-mongo-test/.project/play-mongo-test/.settings
 /play-mongo-test/logs
 /play-mongo-test/tmp
+/.settings
+/eclipse
+/libsrc
