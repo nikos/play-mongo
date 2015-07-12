@@ -210,7 +210,18 @@ public class MongoDB {
 	public static long count(String collectionName, String query, Object[] params) {
 		return db().getCollection(collectionName).getCount(createQueryDbObject(query, params));
 	}
-	
+
+	/**
+	 * Counts the records in the collection matching the query object
+	 * 
+	 * @param collectionName - the queried collection
+	 * @param queryObject - the query object
+	 * @return
+	 */
+	public static long count(String collectionName, DBObject queryObject) {
+		return db().getCollection(collectionName).getCount(queryObject);
+	}
+
 	/**
 	 * Provides a cursor to the objects in a collection, matching the query string.
 	 * 
@@ -235,6 +246,18 @@ public class MongoDB {
 	@SuppressWarnings("rawtypes") 
 	public static MongoCursor find(String collectionName, Class clazz) {
 		return new MongoCursor(db().getCollection(collectionName).find(), clazz);
+	}
+
+	/**
+	 * Provides a cursor to the objects in a collection, matching the query object
+	 * 
+	 * @param collectionName - the target collection
+	 * @param queryObject - the query object 
+	 * @param clazz - the type of MongoModel
+	 * @return - a mongo cursor
+	 */
+	public static MongoCursor find(String collectionName, DBObject queryObject, Class clazz) {
+		return new MongoCursor(db().getCollection(collectionName).find(queryObject), clazz);
 	}
 
     public static <T extends MongoModel> T findById(String collectionName, Class clazz, ObjectId id) {
@@ -302,7 +325,20 @@ public class MongoDB {
 		
 		return deleteCount;
 	}
-	
+
+	/**
+	 * Deletes models from a collection that match a specific query object
+	 * 
+	 * @param collectionName - the collection 
+	 * @param queryObject - the query object
+	 * @return - the number of models deleted
+	 */
+	public static long delete(String collectionName, DBObject queryObject) {
+		long deleteCount = db().getCollection(collectionName).getCount(queryObject);
+		db().getCollection(collectionName).remove(queryObject);
+		return deleteCount;
+	}
+
 	/**
 	 * Deletes all models from the collection.
 	 * 

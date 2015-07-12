@@ -1,6 +1,9 @@
 package play.modules.mongo;
 
 import org.bson.types.ObjectId;
+
+import com.mongodb.DBObject;
+
 import play.db.Model;
 
 import java.io.Serializable;
@@ -33,10 +36,18 @@ public class MongoModel implements Model, Serializable {
         throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
     }
     
-    public static MongoCursor find(String query, Object... params) {
+    public static long count(DBObject queryObject) {
         throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
     }
     
+    public static MongoCursor find(String query, Object... params) {
+        throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
+    }
+
+    public static MongoCursor find(DBObject queryObject) {
+        throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
+    }
+
     public static MongoCursor find() {
         throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
     }
@@ -53,6 +64,10 @@ public class MongoModel implements Model, Serializable {
         throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
     }
     
+    public static long delete(DBObject queryObject) {
+        throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
+    }
+
     public static long deleteAll(){
     	throw new UnsupportedOperationException("Please annotate your model with @MongoEntity annotation.");
     }

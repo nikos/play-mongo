@@ -104,7 +104,11 @@ public class MongoCursor {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends MongoModel> T first(){
-		return (T)fetch(1,1).get(0);
+		List<T> limitedList = fetch(1,1);
+		if (!limitedList.isEmpty()) {
+			return limitedList.get(0);
+		}
+		return null;
 	}
 	
 	/**
@@ -117,7 +121,18 @@ public class MongoCursor {
 		cursor.skip(from);
 		return this;
 	}
-	
+
+	/**
+	 * Limit the given the number of records.
+	 * 
+	 * @param limit - the maximum number of records
+	 * @return - the cursor
+	 */
+	public MongoCursor limit(int limit){
+		cursor.limit(limit);
+		return this;
+	}
+
 	/**
 	 * Orders the objects pointed to by the cursor, using the
 	 * orderBy string.
