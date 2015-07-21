@@ -89,6 +89,10 @@ public class MongoEnhancer extends Enhancer {
         CtMethod count2 = CtMethod.make("public static long count(java.lang.String query, java.lang.Object[] params) { return MongoDB.count(getCollectionName(), query, params); }", ctClass);
         ctClass.addMethod(count2);
 
+        // count3
+        CtMethod count3 = CtMethod.make("public static long count(com.mongodb.DBObject queryObject) { return MongoDB.count(getCollectionName(), queryObject); }", ctClass);
+        ctClass.addMethod(count3);
+
         // find        
         CtMethod find = CtMethod.make("public static MongoCursor find(String query, Object[] params){ return MongoDB.find(getCollectionName(),query,params,"+entityName+".class); }", ctClass);
         ctClass.addMethod(find);
@@ -97,14 +101,22 @@ public class MongoEnhancer extends Enhancer {
         CtMethod find2 = CtMethod.make("public static MongoCursor find(){ return MongoDB.find(getCollectionName(),"+entityName+".class); }", ctClass);
         ctClass.addMethod(find2);
       
+        // find3        
+        CtMethod find3 = CtMethod.make("public static MongoCursor find(com.mongodb.DBObject queryObject){ return MongoDB.find(getCollectionName(),queryObject,"+entityName+".class); }", ctClass);
+        ctClass.addMethod(find3);
+
         // delete        
         CtMethod delete = CtMethod.make("public void delete() { MongoDB.delete(getCollectionName(), this); }", ctClass);
         ctClass.addMethod(delete);
         
-        // delete        
+        // delete2        
         CtMethod delete2 = CtMethod.make("public static long delete(String query, Object[] params) { return MongoDB.delete(getCollectionName(), query, params); }", ctClass);
         ctClass.addMethod(delete2);
-    
+
+        // delete3        
+        CtMethod delete3 = CtMethod.make("public static long delete(com.mongodb.DBObject queryObject) { return MongoDB.delete(getCollectionName(), queryObject); }", ctClass);
+        ctClass.addMethod(delete3);
+
         // deleteAll        
         CtMethod deleteAll = CtMethod.make("public static long deleteAll() { return MongoDB.deleteAll(getCollectionName()); }", ctClass);
         ctClass.addMethod(deleteAll);

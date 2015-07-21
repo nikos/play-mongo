@@ -30,6 +30,8 @@ public class Car extends MongoModel {
 	public String name;
 	public String colour;
 	public int topSpeed;
+	public Date firstProductionDate;
+    public boolean underProduction;
 	
 }
 
@@ -75,7 +77,14 @@ bc.. List<Car> toyotas = Car.find("byName", "Toyota").fetch();
 
 List<Car> whiteToyotas = Car.find("byNameAndColour", "Toyota", "white").fetch();
 
-p. Currently the Mongo module only supports the 'And' query operator.
+p. A more complete query engine enable SQL Like query, with support followings operators
+
+bc.. =, !=, >, >=, <, <=, LIKE, NOT LIKE, IN, NOT IN, IS NULL, IS NOT NULL, AND, OR  
+
+p. To use Boolean and Date criteria, values must be passed in parameters with JPAStyle numbering syntax (?1, ?2 ...)
+p. To use mixed logical expression with both AND and OR operators, brackets must be used to avoid priority management / misunderstanding
+
+bc.. Car.find("name = 'Toyota' and firstProductionDate > ?1 and (colour in ('red', 'blue', 'green') or colour like '%pink%' or speed > 130) and underProduction = ?2", new Date(56), true)
 
 h3. Ordering
 
