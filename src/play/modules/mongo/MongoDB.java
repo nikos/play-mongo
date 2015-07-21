@@ -21,7 +21,9 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
 import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 
 
 public class MongoDB {
@@ -32,6 +34,8 @@ public class MongoDB {
     private static String host;
     private static Integer port;
     private static String dbname;
+    private static String username;
+    private static String password;
 
     /**
      * Obtain a reference to the mongo database.
@@ -40,13 +44,7 @@ public class MongoDB {
      */
 	public static DB db() {
 		if (db == null) {
-			if (Play.configuration.containsKey("mongo.username") && Play.configuration.containsKey("mongo.password")) {
-				String username = Play.configuration.getProperty("mongo.username");
-				String passwd = Play.configuration.getProperty("mongo.password");
-				init(username, passwd);
-			} else {
-				init();
-			}
+			init();
 		}
 		
 		return db;
@@ -60,6 +58,8 @@ public class MongoDB {
         host = null;
         port = null;
         dbname = null;
+        username = null;
+        password = null;
         init();
     }
 
@@ -75,22 +75,26 @@ public class MongoDB {
 			port = Integer.parseInt(Play.configuration.getProperty("mongo.port", "27017"));
 			dbname = Play.configuration.getProperty("mongo.database", "play." + Play.configuration.getProperty("application.name"));
 		}
+		if (username == null || password == null) {
+			username = Play.configuration.getProperty("mongo.username");
+			password = Play.configuration.getProperty("mongo.password");
+		}
 		
 		Logger.info("initializing DB ["+host+"]["+port+"]["+dbname+"]");
 		
 		try {
-			mongo = new MongoClient(host, port);
+			ServerAddress lSA = new ServerAddress(host, port);
+			List<MongoCredential> lCred = new ArrayList<MongoCredential>();
+			if (username != null && password != null) {
+				lCred.add(MongoCredential.createCredential(username, dbname, password.toCharArray()));
+			}
+			mongo = new MongoClient(lSA, lCred);
 			db = mongo.getDB(dbname);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (MongoException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public static void init(String username, String password){
-		init();
-		db.authenticate(username, password.toCharArray());
 	}
 	
 	/**
@@ -143,51 +147,6 @@ public class MongoDB {
 		
 		return indexNames.toArray(new String[indexNames.size()]);
 	}
-	
-	/**
-	 * Adds a user to the database. We must manually set the readOnly parameter
-	 * because the java mongo API does not yet support it. It will only work
-	 * with database versions > 1.3.
-	 * 
-	 * @param username
-	 * @param passwd
-	 * @param readOnly
-	 */
-	public static void addUser(String username, String passwd, boolean readOnly) {
-		db().addUser(username, passwd.toCharArray());
-		DBCollection c = db().getCollection("system.users");
-		
-		DBObject userObj = c.findOne(new BasicDBObject("user", username));
-		if (userObj != null) {
-			userObj.put("readOnly", readOnly);
-			c.save(userObj);
-		}
-	}
-	
-	/**
-	 * Removes a user from the database.
-	 * 
-	 * @param username
-	 */
-	public static void removeUser(String username) {
-		DBCollection c = db().getCollection("system.users");
-		
-		DBObject userObj = c.findOne(new BasicDBObject("user", username));
-		if (userObj != null) {
-			c.remove(userObj);
-		}
-	}
-	
-	/**
-	 * Authenticates a user against a database.
-	 * 
-	 * @param username
-	 * @param password
-	 */
-	public static boolean authenticate(String username, String password) {
-		return db().authenticate(username, password.toCharArray());
-	}
-	
 	
 	/**
 	 * Counts the records in the collection.
